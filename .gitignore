@@ -2,4 +2,3 @@ env
 setenv.sh
 __pycache__
 testing.py
-tests/

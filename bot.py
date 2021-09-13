@@ -1,14 +1,29 @@
 '''main file'''
 import os
-import tinvest
+import json
+import requests
+from pydantic import BaseModel, Field, ValidationError
 from src import settings
-from src.modules import mail_handler
+from src.modules import mail_handler, tinkoff_api
 
-mail_handler.test_mail()
+for strategy_name in settings.STRATEGY_NAMES:
+    print(mail_handler.get_strategy_status_from_mail_in_json(strategy_name))
 
+#print(json.dumps(tinkoff_api.get_portfolio(), ensure_ascii=False, sort_keys=True, indent=4))
 
+#print(json.dumps(tinkoff_api.get_user_accounts(), ensure_ascii=False, sort_keys=True, indent=2))
 
+#print(tinkoff_api.generate_request('user/accounts'))
 
+'''resp = tinkoff_api.UserResponse()
+for account in tinkoff_api.UserResponse.payload.UserAccounts:
+    print(account.broker_account_type)
+print(json.dumps(res))'''
+try:
+    account_list = tinkoff_api.get_user_accounts()
+except ValidationError as e:
+    print(e.json())
 
-'''c = tinvest.SyncClient(settings.TINKOFF_API_TOKEN) # для брокерского счета
-r = c.get_portfolio() # если портфелей несколько, то их нужно указать'''
+print(type(account_list))
+for account in account_list:
+    print(account.broker_account_id)
