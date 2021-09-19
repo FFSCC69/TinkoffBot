@@ -1,29 +1,52 @@
-'''main file'''
+'''main executing file'''
 import os
 import json
-import requests
-from pydantic import BaseModel, Field, ValidationError
-from src import settings
-from src.modules import mail_handler, tinkoff_api
+import requests, socket
+from pydantic import ValidationError
+from src.settings import (
+    STRATEGY_NAMES
+)
+from src.modules import tinkoff_api, tinkoff_classes
+from src.modules.mail_handler import get_strategy_status_from_mail
+from src.modules.tinkoff_highlvl import * # to do
 
-for strategy_name in settings.STRATEGY_NAMES:
-    print(mail_handler.get_strategy_status_from_mail_in_json(strategy_name))
+def main():
+    try:
+        for strategy_name in STRATEGY_NAMES:
+            print(get_strategy_status_from_mail(strategy_name))
+    except socket.error as e:
+        print(e)
+        print('socket error')
 
-#print(json.dumps(tinkoff_api.get_portfolio(), ensure_ascii=False, sort_keys=True, indent=4))
+    try:
+        resp_base = tinkoff_api.get_orders()
+        print(type(resp_base))
+        print(resp_base)
+    except requests.RequestException as e:
+        print(e)
+        print('requests error')
+    except tinkoff_api.TinkoffError as e:
+        print(type(e))
+        print(e.tracking_id)
+    except ValidationError as e:
+        print(e.json())
+        print('validation error')
 
-#print(json.dumps(tinkoff_api.get_user_accounts(), ensure_ascii=False, sort_keys=True, indent=2))
 
-#print(tinkoff_api.generate_request('user/accounts'))
+if __name__ == '__main__':
+    main()
 
-'''resp = tinkoff_api.UserResponse()
-for account in tinkoff_api.UserResponse.payload.UserAccounts:
-    print(account.broker_account_type)
-print(json.dumps(res))'''
-try:
-    account_list = tinkoff_api.get_user_accounts()
-except ValidationError as e:
-    print(e.json())
 
-print(type(account_list))
-for account in account_list:
-    print(account.broker_account_id)
+'''
+def func():
+    return request.get(url).json()
+
+t1 = Thread(target = func)
+t2 = Thread(target = func)
+
+t1.start()
+t2.start()
+
+while True:
+    pass
+'''
