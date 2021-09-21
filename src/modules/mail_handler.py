@@ -28,7 +28,6 @@ def rise_mail_connection() -> imaplib.IMAP4_SSL:
     mail.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
     return mail
 
-
 def get_strategy_alert_mail_content(mail_content: str) -> StrategyAlert:
     '''From mail_content get message and convert it to json'''
     mail_content = mail_content.replace(
@@ -49,12 +48,11 @@ def get_strategy_alert_mail_content(mail_content: str) -> StrategyAlert:
     strategy_alert = StrategyAlert.parse_raw(encoded_json_string)
     return strategy_alert
 
-
-def get_strategy_status_from_mail(strategy_name: str) -> Union[dict, str]:
+def get_strategy_status_from_mail(strategy_name: str) -> Union[StrategyAlert, str]:
     '''
     Receiveing mail and output:
-    json dict if works fine
-    "NoMail" if empty
+    StrategyAlert object if works fine
+    "NoMail" if empty mail list
     "TooManyMails" if lost sequence
     '''
 

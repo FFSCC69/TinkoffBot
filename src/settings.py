@@ -33,6 +33,6 @@ TIME_ZONE_LOCAL = os.getenv('TIME_ZONE_LOCAL')
 '''Time zones'''
 
 STRATEGY_NAMES = (
-  "BTC_TEST_ALERT",
+  "ENDP_TEST_ALERT",
 )
 '''List of strategies'''

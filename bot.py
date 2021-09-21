@@ -1,7 +1,6 @@
 '''main executing file'''
-import os
-import json
-import requests, socket
+import threading
+import time
 from pydantic import ValidationError
 from src.settings import (
     STRATEGY_NAMES
@@ -10,27 +9,48 @@ from src.modules import tinkoff_api, tinkoff_classes
 from src.modules.mail_handler import get_strategy_status_from_mail
 from src.modules.tinkoff_highlvl import * # to do
 
-def main():
-    try:
-        for strategy_name in STRATEGY_NAMES:
-            print(get_strategy_status_from_mail(strategy_name))
-    except socket.error as e:
-        print(e)
-        print('socket error')
+def sustain_trading_thread(strategy_name: str):
+    '''All in-thread actions and logic'''
+    while True:
+        time.sleep(1)
+        strategy_alert = get_strategy_status_from_mail(strategy_name)
+        if strategy_alert == 'NoMail':
+            pass
+        elif strategy_alert == 'TooManyMails':
+            pass #raise mail sequence error
+        else:
+            #print logs
+            print('got order')
+            executed_order = tinkoff_api.post_market_order(
+                tinkoff_classes.MarketOrderRequest.parse_obj(
+                    {
+                        'lots': strategy_alert.quantity,
+                        'operation': strategy_alert.order_action.capitalize()
+                    }
+                ),
+                'BBG000C0HQ54')
+            #executed logs
 
-    try:
-        resp_base = tinkoff_api.get_orders()
-        print(type(resp_base))
-        print(resp_base)
-    except requests.RequestException as e:
-        print(e)
-        print('requests error')
-    except tinkoff_api.TinkoffError as e:
-        print(type(e))
-        print(e.tracking_id)
-    except ValidationError as e:
-        print(e.json())
-        print('validation error')
+def main():
+    trading_threads = []
+    for strategy_name in STRATEGY_NAMES:
+        thread = threading.Thread(
+        target=sustain_trading_thread,
+        args=(strategy_name,),
+        daemon=True
+        )
+        thread.name = 'thread ' + strategy_name
+        trading_threads.append(thread)
+        thread.start()
+
+    while True:
+        time.sleep(0.5)
+        active_threads_count = len(threading.enumerate())
+        if active_threads_count < len(STRATEGY_NAMES) + 1: #with main thread
+            for thread in trading_threads:
+                if not thread.is_alive():
+                    break #logs
+            break
 
 
 if __name__ == '__main__':
@@ -50,3 +70,5 @@ t2.start()
 while True:
     pass
 '''
+# BBG000C0HQ54 ENDP
+# BBG000QCW561 VEON
