@@ -28,11 +28,21 @@ EMAIL_SERVER = os.getenv('EMAIL_SERVER')
 '''Mail server'''
 
 TIME_ZONE_UTC = 'UTC'
-TIME_ZONE_LOCAL = os.getenv('TIME_ZONE_LOCAL')
-#TIME_ZONE = 'your_time_zone'
+TIME_ZONE_LOCAL = 'Europe/Moscow'
 '''Time zones'''
 
-STRATEGY_NAMES = (
-  "ENDP_TEST_ALERT",
-)
-'''List of strategies'''
+STRATEGIES = {
+  'RIG_TEST': 'RIG',
+  'SPCE_TEST': 'SPCE'
+}
+'''Dict of strategies and their tickers'''
+
+ENABLED_DATABASE_LOGS = False
+'''Database connection'''
+
+TELEGRAM_API_TOKEN = os.getenv('TELEGRAM_API_TOKEN')
+#TELEGRAM_API_TOKEN = 'bot token for telegram from @BotFather'
+TELEGRAM_ADMIN_ID = os.getenv('TELEGRAM_ADMIN_ID')
+#TELEGRAM_ADMIN_ID = 'your personal account id in telegram'
+ENABLE_TELEGRAM_MODULE = True
+'''Telegram connection'''

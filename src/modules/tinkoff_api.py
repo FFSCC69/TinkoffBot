@@ -54,9 +54,9 @@ class TinkoffError(Exception):
         self.message = TinkoffErrorObject.payload.message
         self.code = TinkoffErrorObject.payload.code
 
-def observe_tinkoff_exception(response_json: str):
+def observe_tinkoff_exception(response_json: str): # for testing purpose
     '''Raise exception if tinkoff server cannot handle request
-    Has tracking_id, message, code '''
+    Has tracking_id, message, code'''
     examinated_response_object = TinkoffBaseResponse.parse_raw(response_json)
     if examinated_response_object.status == 'Error':
         error_object = TinkoffErrorObject.parse_raw(response_json)

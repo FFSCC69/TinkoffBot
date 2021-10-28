@@ -2,7 +2,6 @@
 
 import email
 import imaplib
-import json
 from typing import Union
 from decimal import Decimal
 from pydantic import BaseModel
@@ -48,7 +47,7 @@ def get_strategy_alert_mail_content(mail_content: str) -> StrategyAlert:
     strategy_alert = StrategyAlert.parse_raw(encoded_json_string)
     return strategy_alert
 
-def get_strategy_status_from_mail(strategy_name: str) -> Union[StrategyAlert, str]:
+def get_strategy_status_from_mail(strategy_name: str, mail: imaplib.IMAP4_SSL) -> Union[StrategyAlert, str]:
     '''
     Receiveing mail and output:
     StrategyAlert object if works fine
@@ -56,7 +55,6 @@ def get_strategy_status_from_mail(strategy_name: str) -> Union[StrategyAlert, st
     "TooManyMails" if lost sequence
     '''
 
-    mail = rise_mail_connection()
     mail.select('inbox')
 
     searchable_strategy_name = (
@@ -72,7 +70,7 @@ def get_strategy_status_from_mail(strategy_name: str) -> Union[StrategyAlert, st
     for block in data:
         mail_ids += block.split()
 
-    if len(mail_ids) > 1: # how many mails
+    if len(mail_ids) > 1: # how many unseen mails
         return 'TooManyMails'
 
     for i in mail_ids:
