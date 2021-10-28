@@ -1,4 +1,4 @@
-'''High lvl functions fot tinkoff API'''
+'''High lvl functions for tinkoff API'''
 
 from .tinkoff_classes import (
     TinkoffBaseResponse,
