@@ -51,7 +51,7 @@ def create_market_order(strategy_alert, figi: str) -> PlacedMarketOrder:
     return post_market_order(
         MarketOrderRequest.parse_obj(
             {
-                'lots': 0,
+                'lots': strategy_alert.quantity,
                 'operation': strategy_alert.order_action.capitalize()
             }
         ),
